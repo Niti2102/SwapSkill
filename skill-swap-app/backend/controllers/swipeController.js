@@ -79,6 +79,12 @@ const checkForMatch = async (user1Id, user2Id) => {
         const user1 = await User.findById(user1Id);
         const user2 = await User.findById(user2Id);
 
+        console.log('Checking match between:', user1.name, 'and', user2.name);
+        console.log('User1 skills known:', user1.skillsKnown);
+        console.log('User1 skills wanted:', user1.skillsWanted);
+        console.log('User2 skills known:', user2.skillsKnown);
+        console.log('User2 skills wanted:', user2.skillsWanted);
+
         // Check if user1's skills match user2's wanted skills
         const user1CanTeachUser2 = user1.skillsKnown.some(skill => 
             user2.skillsWanted.includes(skill)
@@ -94,7 +100,14 @@ const checkForMatch = async (user1Id, user2Id) => {
             swipe.userId.toString() === user1Id && swipe.direction === 'right'
         );
 
-        return user1CanTeachUser2 && user2CanTeachUser1 && user2SwipedRight;
+        console.log('User1 can teach User2:', user1CanTeachUser2);
+        console.log('User2 can teach User1:', user2CanTeachUser1);
+        console.log('User2 swiped right on User1:', !!user2SwipedRight);
+
+        const isMatch = user1CanTeachUser2 && user2CanTeachUser1 && user2SwipedRight;
+        console.log('Final match result:', isMatch);
+
+        return isMatch;
     } catch (error) {
         console.error('Match check error:', error);
         return false;

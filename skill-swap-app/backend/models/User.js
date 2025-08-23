@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
         skillsWanted: [String],
         swipes: [{
             userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-            direction: { type: String, enum: ['left', 'right'] },
+            direction: { type: String, enum: ['left', 'right'] }
         }],
         matches: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
     },
