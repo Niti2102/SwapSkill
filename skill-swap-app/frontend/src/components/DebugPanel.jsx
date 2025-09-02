@@ -70,10 +70,14 @@ const DebugPanel = () => {
     // Test meetings endpoint
     try {
       const response = await axios.get('/api/meetings/my-meetings')
+      const meetings = Array.isArray(response.data) ? response.data : []
+      const completedMeetings = meetings.filter(m => m.status === 'completed')
+      
       results.tests.meetingsEndpoint = {
         status: 'success',
         message: 'Meetings endpoint working',
-        count: Array.isArray(response.data) ? response.data.length : 'N/A'
+        count: meetings.length,
+        completed: completedMeetings.length
       }
     } catch (error) {
       results.tests.meetingsEndpoint = {
@@ -155,7 +159,9 @@ const DebugPanel = () => {
                 {key}: {result.message}
               </span>
               {result.count !== undefined && (
-                <span style={{ color: 'var(--text-muted)' }}> ({result.count})</span>
+                <span style={{ color: 'var(--text-muted)' }}> 
+                  ({result.count}{result.completed !== undefined ? `, ${result.completed} completed` : ''})
+                </span>
               )}
               {result.status_code && (
                 <span style={{ color: 'var(--accent-error)' }}> [{result.status_code}]</span>

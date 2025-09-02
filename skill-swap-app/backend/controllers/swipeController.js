@@ -49,6 +49,34 @@ const swipeUser = async (req, res) => {
                     $addToSet: { matches: currentUserId }
                 });
 
+                // Send real-time match notification to both users
+                const io = req.app.get('io');
+                if (io) {
+                    // Notify current user
+                    io.to(`user_${currentUserId}`).emit('match', {
+                        type: 'new_match',
+                        message: 'It\'s a match! 🎉',
+                        matchedUser: {
+                            id: targetUser._id,
+                            name: targetUser.name,
+                            skillsKnown: targetUser.skillsKnown,
+                            skillsWanted: targetUser.skillsWanted
+                        }
+                    });
+
+                    // Notify target user
+                    io.to(`user_${targetUserId}`).emit('match', {
+                        type: 'new_match',
+                        message: 'It\'s a match! 🎉',
+                        matchedUser: {
+                            id: currentUser._id,
+                            name: currentUser.name,
+                            skillsKnown: currentUser.skillsKnown,
+                            skillsWanted: currentUser.skillsWanted
+                        }
+                    });
+                }
+
                 return res.json({
                     message: 'It\'s a match! 🎉',
                     isMatch: true,
@@ -79,37 +107,46 @@ const checkForMatch = async (user1Id, user2Id) => {
         const user1 = await User.findById(user1Id);
         const user2 = await User.findById(user2Id);
 
-        console.log('Checking match between:', user1.name, 'and', user2.name);
-        console.log('User1 skills known:', user1.skillsKnown);
-        console.log('User1 skills wanted:', user1.skillsWanted);
-        console.log('User2 skills known:', user2.skillsKnown);
-        console.log('User2 skills wanted:', user2.skillsWanted);
+        console.log('\n=== 🔍 MATCH CHECK DEBUG ===');
+        console.log(`Checking match between: ${user1.name} (ID: ${user1Id}) and ${user2.name} (ID: ${user2Id})`);
+        console.log(`${user1.name} skills known:`, user1.skillsKnown);
+        console.log(`${user1.name} skills wanted:`, user1.skillsWanted);
+        console.log(`${user2.name} skills known:`, user2.skillsKnown);
+        console.log(`${user2.name} skills wanted:`, user2.skillsWanted);
+
+        // Ensure arrays exist
+        const user1SkillsKnown = user1.skillsKnown || [];
+        const user1SkillsWanted = user1.skillsWanted || [];
+        const user2SkillsKnown = user2.skillsKnown || [];
+        const user2SkillsWanted = user2.skillsWanted || [];
 
         // Check if user1's skills match user2's wanted skills
-        const user1CanTeachUser2 = user1.skillsKnown.some(skill => 
-            user2.skillsWanted.includes(skill)
+        const user1CanTeachUser2 = user1SkillsKnown.some(skill => 
+            user2SkillsWanted.includes(skill)
         );
 
         // Check if user2's skills match user1's wanted skills
-        const user2CanTeachUser1 = user2.skillsKnown.some(skill => 
-            user1.skillsWanted.includes(skill)
+        const user2CanTeachUser1 = user2SkillsKnown.some(skill => 
+            user1SkillsWanted.includes(skill)
         );
 
-        // Check if user2 has already swiped right on user1
-        const user2SwipedRight = user2.swipes.find(swipe => 
-            swipe.userId.toString() === user1Id && swipe.direction === 'right'
-        );
+        console.log(`${user1.name} can teach ${user2.name}:`, user1CanTeachUser2);
+        console.log(`${user2.name} can teach ${user1.name}:`, user2CanTeachUser1);
 
-        console.log('User1 can teach User2:', user1CanTeachUser2);
-        console.log('User2 can teach User1:', user2CanTeachUser1);
-        console.log('User2 swiped right on User1:', !!user2SwipedRight);
-
-        const isMatch = user1CanTeachUser2 && user2CanTeachUser1 && user2SwipedRight;
-        console.log('Final match result:', isMatch);
+        // Match conditions:
+        // 1. STRICT: Both users can teach each other (mutual benefit)
+        // 2. LENIENT: At least one user can teach the other
+        // 3. DEMO: Any right swipe is a match (for testing)
+        
+        // Using LENIENT condition for better user experience
+        const isMatch = user1CanTeachUser2 || user2CanTeachUser1;
+        
+        console.log('🎯 Match result:', isMatch ? '✅ MATCH!' : '❌ No match');
+        console.log('=== END MATCH CHECK ===\n');
 
         return isMatch;
     } catch (error) {
-        console.error('Match check error:', error);
+        console.error('❌ Match check error:', error);
         return false;
     }
 };
@@ -144,9 +181,47 @@ const getUsersToSwipe = async (req, res) => {
 const getMatches = async (req, res) => {
     try {
         const currentUserId = req.user.userId;
-        const currentUser = await User.findById(currentUserId).populate('matches', '-password -swipes');
+        const currentUser = await User.findById(currentUserId);
 
-        res.json(currentUser.matches);
+        // Get actual matches (both users swiped right)
+        const actualMatches = await User.find({
+            _id: { $in: currentUser.matches }
+        }).select('-password -swipes');
+
+        // Get potential matches (you swiped right, skills are complementary)
+        const rightSwipes = currentUser.swipes.filter(swipe => swipe.direction === 'right');
+        const potentialMatches = [];
+
+        for (const swipe of rightSwipes) {
+            const targetUser = await User.findById(swipe.userId).select('-password -swipes');
+            if (targetUser) {
+                // Check if skills are complementary
+                const user1CanTeachUser2 = currentUser.skillsKnown.some(skill => 
+                    targetUser.skillsWanted.includes(skill)
+                );
+                const user2CanTeachUser1 = targetUser.skillsKnown.some(skill => 
+                    currentUser.skillsWanted.includes(skill)
+                );
+
+                if (user1CanTeachUser2 && user2CanTeachUser1) {
+                    potentialMatches.push({
+                        ...targetUser.toObject(),
+                        isPotentialMatch: true
+                    });
+                }
+            }
+        }
+
+        // Combine actual matches and potential matches
+        const allMatches = [...actualMatches, ...potentialMatches];
+        
+        console.log('Matches found:', {
+            actualMatches: actualMatches.length,
+            potentialMatches: potentialMatches.length,
+            total: allMatches.length
+        });
+
+        res.json(allMatches);
     } catch (error) {
         console.error('Get matches error:', error);
         res.status(500).json({ message: 'Server error' });

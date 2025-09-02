@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useSocket } from '../contexts/SocketContext'
 import Navbar from '../components/Navbar'
-import DebugPanel from '../components/DebugPanel'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
@@ -12,8 +11,9 @@ const Dashboard = () => {
   const { notificationCounts } = useSocket()
   const [stats, setStats] = useState({
     matches: 0,
-    pendingMeetings: 0,
-    unreadMessages: 0
+    completedExchanges: 0,
+    skillsToTeach: 0,
+    skillsToLearn: 0
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -24,13 +24,16 @@ const Dashboard = () => {
     }
   }, [user])
 
-  // Update unread messages from socket context
+  // Update skills count from user profile when user data changes
   useEffect(() => {
-    setStats(prev => ({
-      ...prev,
-      unreadMessages: notificationCounts.messages || 0
-    }))
-  }, [notificationCounts.messages])
+    if (user) {
+      setStats(prev => ({
+        ...prev,
+        skillsToTeach: user.skillsKnown?.length || 0,
+        skillsToLearn: user.skillsWanted?.length || 0
+      }))
+    }
+  }, [user])
 
   const fetchStats = async () => {
     try {
@@ -65,53 +68,54 @@ const Dashboard = () => {
         axios.get('/api/meetings/my-meetings', config).catch(err => {
           console.warn('Meetings API failed:', err.response?.status, err.response?.data)
           return { data: [] }
-        }),
-        axios.get('/api/chat/unread', config).catch(err => {
-          console.warn('Chat API failed:', err.response?.status, err.response?.data)
-          return { data: [] }
         })
       ]
       
-      const [matchesRes, meetingsRes, messagesRes] = await Promise.all(promises)
+      const [matchesRes, meetingsRes] = await Promise.all(promises)
       
       console.log('✅ API responses received:')
       console.log('📝 Matches response:', matchesRes.data)
       console.log('📝 Meetings response:', meetingsRes.data)
-      console.log('📝 Messages response:', messagesRes.data)
       
       const matches = Array.isArray(matchesRes.data) ? matchesRes.data : []
       const meetings = Array.isArray(meetingsRes.data) ? meetingsRes.data : []
-      const messages = Array.isArray(messagesRes.data) ? messagesRes.data : []
       
-      // Filter pending meetings where current user is the participant (not initiator)
-      const pendingMeetings = meetings.filter(m => {
-        const isParticipant = m.participant?._id === user._id
-        const isPending = m.status === 'pending'
-        console.log('📋 Meeting check:', {
-          meetingId: m._id,
-          title: m.title,
-          status: m.status,
-          participantId: m.participant?._id,
-          currentUserId: user._id,
-          isParticipant,
-          isPending,
-          shouldCount: isParticipant && isPending
-        })
-        return isParticipant && isPending
-      }).length
+      console.log('📊 Data Arrays:')
+      console.log('- Total matches:', matches.length)
+      console.log('- Total meetings:', meetings.length)
       
-      const unreadMessages = messages.reduce((sum, item) => sum + (item.count || 0), 0)
+      // Calculate completed skill exchanges (meetings with status 'completed')
+      const completedExchanges = meetings.filter(m => m.status === 'completed').length
+      
+      // Get skills count from user profile (already updated in useEffect)
+      const skillsToTeach = user.skillsKnown?.length || 0
+      const skillsToLearn = user.skillsWanted?.length || 0
+      
+      console.log('🔍 Statistics calculation:')
+      console.log('- Completed exchanges:', completedExchanges)
+      console.log('- Skills to teach:', skillsToTeach)
+      console.log('- Skills to learn:', skillsToLearn)
       
       const newStats = {
         matches: matches.length,
-        pendingMeetings: pendingMeetings,
-        unreadMessages: Math.max(unreadMessages, notificationCounts.messages || 0)
+        completedExchanges: completedExchanges,
+        skillsToTeach: skillsToTeach,
+        skillsToLearn: skillsToLearn
       }
       
       console.log('📊 Final calculated stats:', {
-        matches: `${matches.length} (from ${matches.length} matches)`,
-        pendingMeetings: `${pendingMeetings} (filtered from ${meetings.length} total meetings)`,
-        unreadMessages: `${Math.max(unreadMessages, notificationCounts.messages || 0)} (max of backend: ${unreadMessages}, socket: ${notificationCounts.messages || 0})`
+        matches: `${matches.length} (total active connections)`,
+        completedExchanges: `${completedExchanges} (successful skill exchanges)`,
+        skillsToTeach: `${skillsToTeach} (skills you can share)`,
+        skillsToLearn: `${skillsToLearn} (skills you want to learn)`,
+        debugInfo: {
+          totalMeetings: meetings.length,
+          userProfile: {
+            name: user.name,
+            skillsKnown: user.skillsKnown,
+            skillsWanted: user.skillsWanted
+          }
+        }
       })
       setStats(newStats)
       
@@ -341,7 +345,7 @@ const Dashboard = () => {
             marginBottom: '8px',
             fontSize: '2.5rem',
             fontWeight: '700'
-          }}>Welcome back, {user?.name}! 👋</h1>
+          }}>Welcome back, {user?.name}! </h1>
           <p style={{ 
             color: 'var(--text-secondary)', 
             margin: 0, 
@@ -375,35 +379,10 @@ const Dashboard = () => {
             }} />
             <div style={{ fontSize: '3.5rem', marginBottom: '10px', position: 'relative' }}>🤝</div>
             <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: 'bold' }}>{stats.matches}</h3>
-            <p style={{ margin: '10px 0 0 0', opacity: 0.9, fontSize: '1.1rem' }}>Total Matches</p>
+            <p style={{ margin: '10px 0 0 0', opacity: 0.9, fontSize: '1.1rem' }}>Active Connections</p>
           </div>
           
-          {/* Pending Meetings */}
-          <div style={{
-            background: 'linear-gradient(135deg, var(--accent-warning), #d97706)',
-            color: 'white',
-            borderRadius: '16px',
-            padding: '30px',
-            textAlign: 'center',
-            boxShadow: 'var(--shadow-lg)',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              position: 'absolute',
-              top: '-50%',
-              right: '-50%',
-              width: '100%',
-              height: '100%',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
-              borderRadius: '50%'
-            }} />
-            <div style={{ fontSize: '3.5rem', marginBottom: '10px', position: 'relative' }}>📅</div>
-            <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: 'bold' }}>{stats.pendingMeetings}</h3>
-            <p style={{ margin: '10px 0 0 0', opacity: 0.9, fontSize: '1.1rem' }}>Pending Meetings</p>
-          </div>
-          
-          {/* Unread Messages */}
+          {/* Completed Exchanges */}
           <div style={{
             background: 'linear-gradient(135deg, var(--accent-success), #059669)',
             color: 'white',
@@ -423,9 +402,59 @@ const Dashboard = () => {
               background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
               borderRadius: '50%'
             }} />
-            <div style={{ fontSize: '3.5rem', marginBottom: '10px', position: 'relative' }}>💬</div>
-            <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: 'bold' }}>{stats.unreadMessages}</h3>
-            <p style={{ margin: '10px 0 0 0', opacity: 0.9, fontSize: '1.1rem' }}>Unread Messages</p>
+            <div style={{ fontSize: '3.5rem', marginBottom: '10px', position: 'relative' }}>🎯</div>
+            <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: 'bold' }}>{stats.completedExchanges}</h3>
+            <p style={{ margin: '10px 0 0 0', opacity: 0.9, fontSize: '1.1rem' }}>Completed Exchanges</p>
+          </div>
+          
+          {/* Skills to Teach */}
+          <div style={{
+            background: 'linear-gradient(135deg, var(--accent-primary), #7c3aed)',
+            color: 'white',
+            borderRadius: '16px',
+            padding: '30px',
+            textAlign: 'center',
+            boxShadow: 'var(--shadow-lg)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: '-50%',
+              right: '-50%',
+              width: '100%',
+              height: '100%',
+              background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+              borderRadius: '50%'
+            }} />
+            <div style={{ fontSize: '3.5rem', marginBottom: '10px', position: 'relative' }}>🧠</div>
+            <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: 'bold' }}>{stats.skillsToTeach}</h3>
+            <p style={{ margin: '10px 0 0 0', opacity: 0.9, fontSize: '1.1rem' }}>Skills to Teach</p>
+          </div>
+          
+          {/* Skills to Learn */}
+          <div style={{
+            background: 'linear-gradient(135deg, var(--accent-warning), #d97706)',
+            color: 'white',
+            borderRadius: '16px',
+            padding: '30px',
+            textAlign: 'center',
+            boxShadow: 'var(--shadow-lg)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: '-50%',
+              right: '-50%',
+              width: '100%',
+              height: '100%',
+              background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+              borderRadius: '50%'
+            }} />
+            <div style={{ fontSize: '3.5rem', marginBottom: '10px', position: 'relative' }}>📚</div>
+            <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: 'bold' }}>{stats.skillsToLearn}</h3>
+            <p style={{ margin: '10px 0 0 0', opacity: 0.9, fontSize: '1.1rem' }}>Skills to Learn</p>
           </div>
         </div>
 
@@ -504,10 +533,10 @@ const Dashboard = () => {
             fontSize: '1.8rem',
             fontWeight: '600'
           }}>Your Skills Profile</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-            <div>
-              <h3 style={{ color: 'var(--accent-success)', marginBottom: '15px', fontSize: '1.3rem' }}>Skills You Can Teach</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', alignItems: 'start' }}>
+            <div style={{ minHeight: '120px' }}>
+              <h3 style={{ color: 'var(--accent-success)', marginBottom: '15px', fontSize: '1.3rem', textAlign: 'left' }}>Skills You Can Teach</h3>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
                 {user?.skillsKnown?.length > 0 ? user.skillsKnown.map((skill, index) => (
                   <span 
                     key={index}
@@ -518,21 +547,24 @@ const Dashboard = () => {
                       borderRadius: '20px',
                       fontSize: '14px',
                       fontWeight: '500',
-                      boxShadow: 'var(--shadow-sm)'
+                      boxShadow: 'var(--shadow-sm)',
+                      display: 'inline-block',
+                      whiteSpace: 'nowrap',
+                      textAlign: 'center'
                     }}
                   >
                     {skill}
                   </span>
                 )) : (
-                  <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                  <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic', margin: '0', textAlign: 'left' }}>
                     No skills added yet. Update your profile to add skills!
                   </p>
                 )}
               </div>
             </div>
-            <div>
-              <h3 style={{ color: 'var(--accent-secondary)', marginBottom: '15px', fontSize: '1.3rem' }}>Skills You Want to Learn</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+            <div style={{ minHeight: '120px' }}>
+              <h3 style={{ color: 'var(--accent-secondary)', marginBottom: '15px', fontSize: '1.3rem', textAlign: 'left' }}>Skills You Want to Learn</h3>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
                 {user?.skillsWanted?.length > 0 ? user.skillsWanted.map((skill, index) => (
                   <span 
                     key={index}
@@ -543,13 +575,16 @@ const Dashboard = () => {
                       borderRadius: '20px',
                       fontSize: '14px',
                       fontWeight: '500',
-                      boxShadow: 'var(--shadow-sm)'
+                      boxShadow: 'var(--shadow-sm)',
+                      display: 'inline-block',
+                      whiteSpace: 'nowrap',
+                      textAlign: 'center'
                     }}
                   >
                     {skill}
                   </span>
                 )) : (
-                  <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                  <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic', margin: '0', textAlign: 'left' }}>
                     No learning goals set. Update your profile to add skills!
                   </p>
                 )}
@@ -557,9 +592,6 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        
-        {/* Debug Panel - only show in development */}
-        {process.env.NODE_ENV === 'development' && <DebugPanel />}
       </div>
     </div>
   )

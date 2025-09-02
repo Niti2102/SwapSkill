@@ -101,7 +101,36 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/profile" className={isActive('/profile') ? 'active' : ''}>
+            <Link to="/profile" className={isActive('/profile') ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {user?.profilePicture ? (
+                <img 
+                  src={`/api/users/profile-picture/${user.profilePicture}`}
+                  alt="Profile"
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    border: '2px solid var(--accent-primary)',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }}
+                />
+              ) : (
+                <div style={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '50%',
+                  background: 'var(--accent-primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  color: 'white',
+                  fontWeight: 'bold'
+                }}>
+                  {user?.name?.charAt(0)?.toUpperCase()}
+                </div>
+              )}
               Profile
             </Link>
           </li>
