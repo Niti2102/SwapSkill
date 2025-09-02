@@ -187,7 +187,8 @@ const Profile = () => {
       return profilePicturePreview
     }
     if (user?.profilePicture) {
-      return `http://localhost:8000/api/users/profile-picture/${user.profilePicture}`
+      const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+      return `${baseURL}/api/users/profile-picture/${user.profilePicture}`
     }
     return null
   }

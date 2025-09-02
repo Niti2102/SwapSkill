@@ -104,7 +104,7 @@ const Navbar = () => {
             <Link to="/profile" className={isActive('/profile') ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               {user?.profilePicture ? (
                 <img 
-                  src={`http://localhost:8000/api/users/profile-picture/${user.profilePicture}`}
+                  src={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/users/profile-picture/${user.profilePicture}`}
                   alt="Profile"
                   style={{
                     width: '24px',

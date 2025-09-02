@@ -20,7 +20,14 @@ const io = socketIo(server, {
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production' 
+        ? process.env.FRONTEND_URL || 'https://your-frontend-domain.com'
+        : ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:8000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json()); //to get input as json file
 
 // Ensure uploads directory exists
@@ -58,6 +65,12 @@ app.use("/api/users", require("./routes/users"));
 app.use("/api/swipe", require("./routes/swipe"));
 app.use("/api/chat", require("./routes/chat"));
 app.use("/api/meetings", require("./routes/meeting"));
+app.use("/api/notifications", require("./routes/notifications"));
+
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
 app.use("/api/notifications", require("./routes/notifications"));
 
 const port = process.env.PORT || 3000;
