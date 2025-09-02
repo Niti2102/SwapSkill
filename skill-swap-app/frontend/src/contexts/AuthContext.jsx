@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   // Configure axios defaults
-  axios.defaults.baseURL = 'http://localhost:3000'
+  axios.defaults.baseURL = 'http://localhost:8000'
 
   // Add token to requests if it exists
   useEffect(() => {
@@ -31,17 +31,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token')
-      console.log('🔑 Checking authentication...', { tokenExists: !!token })
       
       if (token) {
         try {
-          console.log('📡 Making auth check request...')
           const response = await axios.get('/api/auth/profile')
-          console.log('✅ Auth check successful:', response.data)
           setUser(response.data)
         } catch (error) {
-          console.error('❌ Auth check failed:', error.response?.status, error.response?.data)
-          console.log('🗺 Clearing invalid token...')
           localStorage.removeItem('token')
           delete axios.defaults.headers.common['Authorization']
           
@@ -50,8 +45,6 @@ export const AuthProvider = ({ children }) => {
             toast.error('Session expired. Please log in again.')
           }
         }
-      } else {
-        console.log('🚫 No token found in localStorage')
       }
       setLoading(false)
     }

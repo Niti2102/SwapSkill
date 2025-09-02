@@ -5,32 +5,28 @@ const Message = require('../models/Message');
 const getNotificationCounts = async (req, res) => {
     try {
         const userId = req.user.userId;
-        console.log('📊 Getting notification counts for user:', userId);
 
         // Count pending meetings where user is participant (not organizer)
         const pendingMeetings = await Meeting.countDocuments({
             participant: userId,
             status: 'pending'
         });
-        console.log('📅 Pending meetings for user:', pendingMeetings);
 
         // Count unread messages where user is receiver
         const unreadMessages = await Message.countDocuments({
             receiver: userId,
             read: false
         });
-        console.log('📨 Unread messages for user:', unreadMessages);
 
         const result = {
             meetings: pendingMeetings,
             messages: unreadMessages
         };
         
-        console.log('📊 Final notification counts:', result);
         res.json(result);
 
     } catch (error) {
-        console.error('❌ Get notification counts error:', error);
+        console.error('Get notification counts error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 };

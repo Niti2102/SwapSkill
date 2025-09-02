@@ -34,17 +34,14 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
-
     // Join user to their personal room
     socket.on('join', (userId) => {
         socket.join(`user_${userId}`);
-        console.log(`User ${userId} joined room: user_${userId}`);
     });
 
     // Handle disconnect
     socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
+        // Connection closed
     });
 });
 

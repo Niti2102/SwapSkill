@@ -21,7 +21,7 @@ const Navbar = () => {
       updateNotificationCount('messages', response.data.messages)
       updateNotificationCount('meetings', response.data.meetings)
     } catch (error) {
-      console.error('Error fetching notification counts:', error)
+      // Notification fetch failed silently
     }
   }
 
@@ -104,7 +104,7 @@ const Navbar = () => {
             <Link to="/profile" className={isActive('/profile') ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               {user?.profilePicture ? (
                 <img 
-                  src={`/api/users/profile-picture/${user.profilePicture}`}
+                  src={`http://localhost:8000/api/users/profile-picture/${user.profilePicture}`}
                   alt="Profile"
                   style={{
                     width: '24px',

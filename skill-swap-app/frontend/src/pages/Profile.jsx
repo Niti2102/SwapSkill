@@ -41,15 +41,10 @@ const Profile = () => {
 
   const fetchUserStats = async () => {
     try {
-      console.log('Fetching user stats...')
-      
       const [matchesRes, meetingsRes] = await Promise.all([
         axios.get('/api/swipe/matches'),
         axios.get('/api/meetings/my-meetings')
       ])
-      
-      console.log('Matches response:', matchesRes.data)
-      console.log('Meetings response:', meetingsRes.data)
       
       const matches = Array.isArray(matchesRes.data) ? matchesRes.data : []
       const meetings = Array.isArray(meetingsRes.data) ? meetingsRes.data : []
@@ -66,11 +61,9 @@ const Profile = () => {
         totalMessages: 0 // Will be updated when we implement message count
       }
       
-      console.log('Updated stats:', newStats)
       setStats(newStats)
     } catch (error) {
-      console.error('Error fetching user stats:', error)
-      console.error('Error details:', error.response?.data || error.message)
+      // Stats loading failed silently
     }
   }
 
@@ -156,7 +149,6 @@ const Profile = () => {
       if (fileInput) fileInput.value = ''
       
     } catch (error) {
-      console.error('Error uploading profile picture:', error)
       toast.error(error.response?.data?.message || 'Failed to upload profile picture')
     } finally {
       setUploadingImage(false)
@@ -184,7 +176,6 @@ const Profile = () => {
       await updateProfile({ ...user, profilePicture: null })
       
     } catch (error) {
-      console.error('Error deleting profile picture:', error)
       toast.error(error.response?.data?.message || 'Failed to delete profile picture')
     } finally {
       setUploadingImage(false)
@@ -196,7 +187,7 @@ const Profile = () => {
       return profilePicturePreview
     }
     if (user?.profilePicture) {
-      return `/api/users/profile-picture/${user.profilePicture}`
+      return `http://localhost:8000/api/users/profile-picture/${user.profilePicture}`
     }
     return null
   }

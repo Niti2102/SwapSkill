@@ -71,14 +71,21 @@ const Chat = () => {
         if (selectedUser && 
             ((message.sender.id === selectedUser._id && message.receiver === user._id) ||
              (message.sender.id === user._id && message.receiver === selectedUser._id))) {
-          setMessages(prev => [...prev, {
+          
+          // Create properly structured message object
+          const newMessage = {
             _id: message.id,
             content: message.content,
             messageType: message.messageType,
-            sender: message.sender,
+            sender: {
+              _id: message.sender.id,
+              name: message.sender.name
+            },
             receiver: { _id: message.receiver },
             createdAt: message.createdAt
-          }])
+          }
+          
+          setMessages(prev => [...prev, newMessage])
           
           // If the message is TO the current user and they're viewing the chat, mark as read immediately
           if (message.receiver === user._id && message.sender.id === selectedUser._id) {
@@ -635,6 +642,21 @@ const Chat = () => {
                       radial-gradient(circle at 75% 75%, rgba(6, 182, 212, 0.05) 0%, transparent 50%)
                     `
                   }}>
+                    {/* Chat Layout Helper */}
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: '8px 12px',
+                      marginBottom: '16px',
+                      borderRadius: '12px',
+                      background: 'rgba(139, 92, 246, 0.1)',
+                      border: '1px solid rgba(139, 92, 246, 0.2)',
+                      fontSize: '12px',
+                      color: 'var(--text-muted)'
+                    }}>
+                      <span style={{ opacity: 0.7 }}>📥 Received messages</span>
+                      <span style={{ opacity: 0.7 }}>Sent messages 📤</span>
+                    </div>
                     {messages.length === 0 ? (
                       <div style={{ 
                         textAlign: 'center', 
@@ -658,41 +680,50 @@ const Chat = () => {
                       </div>
                     ) : (
                       messages.map((message) => {
-                        const isMyMessage = message.sender._id === user._id
+                        // Enhanced message alignment logic
+                        const senderId = message.sender?._id || message.sender
+                        const currentUserId = user?._id
+                        const isMyMessage = senderId === currentUserId
+                        
                         return (
                           <div 
                             key={message._id}
                             style={{
                               display: 'flex',
                               justifyContent: isMyMessage ? 'flex-end' : 'flex-start',
-                              marginBottom: '8px',
-                              padding: '0 12px'
+                              marginBottom: '12px',
+                              padding: '0 12px',
+                              width: '100%'
                             }}
                           >
                             <div style={{
                               maxWidth: '70%',
                               display: 'flex',
                               flexDirection: 'column',
-                              alignItems: isMyMessage ? 'flex-end' : 'flex-start'
+                              alignItems: isMyMessage ? 'flex-end' : 'flex-start',
+                              width: 'auto'
                             }}>
-                              {/* Modern Message Bubble */}
+                              {/* Enhanced Message Bubble with Clear Alignment */}
                               <div style={{
                                 background: isMyMessage 
-                                  ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))' 
-                                  : 'var(--bg-card)',
+                                  ? 'linear-gradient(135deg, #8b5cf6, #06b6d4)' // Purple-cyan gradient for sent messages
+                                  : 'var(--bg-card)', // Card background for received messages
                                 color: isMyMessage ? 'white' : 'var(--text-primary)',
-                                padding: '12px 16px',
+                                padding: '14px 18px',
                                 borderRadius: isMyMessage 
-                                  ? '20px 20px 6px 20px' 
-                                  : '20px 20px 20px 6px',
-                                border: isMyMessage ? 'none' : '1px solid var(--border-primary)',
+                                  ? '20px 20px 6px 20px' // Tail on bottom-right for sent
+                                  : '20px 20px 20px 6px', // Tail on bottom-left for received
+                                border: isMyMessage ? 'none' : '2px solid var(--border-primary)',
                                 boxShadow: isMyMessage 
-                                  ? '0 4px 15px rgba(139, 92, 246, 0.3)' 
-                                  : 'var(--shadow-md)',
+                                  ? '0 4px 20px rgba(139, 92, 246, 0.4)' // Purple shadow for sent
+                                  : '0 4px 12px rgba(0, 0, 0, 0.1)', // Subtle shadow for received
                                 position: 'relative',
                                 wordBreak: 'break-word',
-                                marginBottom: '4px',
-                                maxWidth: '85%'
+                                marginBottom: '6px',
+                                maxWidth: '100%',
+                                minWidth: 'fit-content',
+                                // Add alignment helper
+                                alignSelf: isMyMessage ? 'flex-end' : 'flex-start'
                               }}>
                                 {/* Message content */}
                                 <div style={{ 
@@ -727,17 +758,22 @@ const Chat = () => {
                                 </div>
                               </div>
                               
-                              {/* Sender name for received messages */}
+                              {/* Enhanced Sender name for received messages */}
                               {!isMyMessage && (
-                                <span style={{
-                                  fontSize: '11px',
+                                <div style={{
+                                  fontSize: '12px',
                                   color: 'var(--accent-secondary)',
-                                  marginLeft: '12px',
-                                  marginTop: '4px',
-                                  fontWeight: '600'
+                                  marginLeft: '16px',
+                                  marginTop: '6px',
+                                  fontWeight: '600',
+                                  background: 'rgba(139, 92, 246, 0.1)',
+                                  padding: '4px 10px',
+                                  borderRadius: '12px',
+                                  display: 'inline-block',
+                                  alignSelf: 'flex-start'
                                 }}>
-                                  {message.sender.name}
-                                </span>
+                                  {message.sender?.name || 'Unknown User'}
+                                </div>
                               )}
                             </div>
                           </div>

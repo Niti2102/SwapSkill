@@ -5,10 +5,9 @@ const connectDB = async () => {
         // Use default MongoDB URI if not provided
         const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27017/skill-swap-app";
         await mongoose.connect(mongoURI);
-        console.log("MongoDB connected successfully");
+        // MongoDB connected successfully (silent)
     } catch (error) {
-        console.log("MongoDB connection error:", error.message);
-        console.log("Make sure MongoDB is running on your system");
+        console.error("MongoDB connection error:", error.message);
         // Don't exit process, just log the error
     }
 };
