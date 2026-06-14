@@ -48,7 +48,7 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       // Initialize socket connection
-      const newSocket = io('http://localhost:3000');
+      const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:8000');
       
       newSocket.on('connect', () => {
         console.log('Socket connected:', newSocket.id);

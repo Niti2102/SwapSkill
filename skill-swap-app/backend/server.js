@@ -23,7 +23,7 @@ const io = socketIo(server, {
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
         ? '*' // Allow all origins in production for testing
-        : ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:8000'],
+        : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173', 'http://localhost:8000'],
     credentials: false, // Set to false when using '*' origin
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']

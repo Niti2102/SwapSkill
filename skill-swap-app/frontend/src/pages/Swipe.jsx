@@ -172,61 +172,114 @@ const Swipe = () => {
   return (
     <div>
       <Navbar />
-      <div className="container">
-        <div className="card" style={{ maxWidth: '400px', margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>
-            Find Your Skill Partner
-          </h2>
-          
+      <div className="container animate-slideup" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <h2 className="shimmer-text" style={{ 
+          textAlign: 'center', 
+          marginBottom: '35px',
+          fontSize: '2.4rem',
+          fontWeight: '800',
+          letterSpacing: '-0.5px'
+        }}>
+          Find Your Skill Partner
+        </h2>
+        
+        {/* Main Swipe Wrapper */}
+        <div className="glass-panel animate-float" style={{ 
+          width: '100%',
+          maxWidth: '430px', 
+          padding: '30px',
+          boxShadow: 'var(--shadow-xl), var(--glow-accent)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* Glowing backdrop circle */}
+          <div style={{
+            position: 'absolute',
+            top: '-60px',
+            right: '-60px',
+            width: '180px',
+            height: '180px',
+            background: 'var(--accent-secondary)',
+            filter: 'blur(95px)',
+            opacity: 0.12,
+            pointerEvents: 'none'
+          }} />
+
           {/* User Card */}
           <div 
-            className="card" 
+            className="glass-card" 
             style={{ 
               position: 'relative',
-              minHeight: '500px',
+              minHeight: '420px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              border: 'none'
+              padding: '24px',
+              background: 'rgba(20, 20, 35, 0.5)',
+              border: '1px solid rgba(255, 255, 255, 0.06)'
             }}
           >
             {/* Match Score */}
-            <div style={{ 
+            <div className="pill-tag pill-primary animate-glow" style={{ 
               position: 'absolute', 
               top: '20px', 
               right: '20px',
-              background: 'rgba(255,255,255,0.2)',
-              padding: '8px 16px',
-              borderRadius: '20px',
-              fontSize: '14px'
+              background: 'rgba(139, 92, 246, 0.2)',
+              fontSize: '12px'
             }}>
-              Match Score: {matchScore}/10
+              🔥 Match: {matchScore * 10}%
             </div>
             
             {/* User Info */}
             <div style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <div style={{ fontSize: '4rem', marginBottom: '20px' }}>
-                👤
+              {/* Profile Avatar Frame */}
+              <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+                {currentUser.profilePicture ? (
+                  <img 
+                    src={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/users/profile-picture/${currentUser.profilePicture}`}
+                    alt={currentUser.name}
+                    style={{
+                      width: '110px',
+                      height: '110px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '3px solid var(--accent-primary)',
+                      boxShadow: '0 0 20px rgba(139, 92, 246, 0.45)'
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: '110px',
+                    height: '110px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '2.5rem',
+                    color: 'white',
+                    fontWeight: '800',
+                    boxShadow: '0 0 20px rgba(139, 92, 246, 0.35)',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }}>
+                    {currentUser.name?.charAt(0).toUpperCase()}
+                  </div>
+                )}
               </div>
-              <h2 style={{ margin: '0 0 10px 0', fontSize: '2rem' }}>
+
+              <h3 style={{ margin: '0 0 16px 0', fontSize: '1.8rem', fontWeight: '800', color: 'var(--text-primary)' }}>
                 {currentUser.name}
-              </h2>
+              </h3>
               
-              {/* Skills */}
+              {/* Skills Section */}
               <div style={{ marginBottom: '20px' }}>
-                <h4 style={{ margin: '0 0 10px 0', opacity: 0.9 }}>Can Teach:</h4>
+                <h4 style={{ margin: '0 0 8px 0', opacity: 0.9, fontSize: '14px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--accent-success)' }}>Can Teach</h4>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
                   {currentUser.skillsKnown?.map((skill, index) => (
                     <span 
                       key={index}
-                      style={{
-                        background: 'rgba(255,255,255,0.2)',
-                        padding: '4px 12px',
-                        borderRadius: '15px',
-                        fontSize: '12px'
-                      }}
+                      className="pill-tag pill-success"
+                      style={{ fontSize: '11px', padding: '4px 10px' }}
                     >
                       {skill}
                     </span>
@@ -235,17 +288,13 @@ const Swipe = () => {
               </div>
               
               <div>
-                <h4 style={{ margin: '0 0 10px 0', opacity: 0.9 }}>Wants to Learn:</h4>
+                <h4 style={{ margin: '0 0 8px 0', opacity: 0.9, fontSize: '14px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--accent-secondary)' }}>Wants to Learn</h4>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
                   {currentUser.skillsWanted?.map((skill, index) => (
                     <span 
                       key={index}
-                      style={{
-                        background: 'rgba(255,255,255,0.2)',
-                        padding: '4px 12px',
-                        borderRadius: '15px',
-                        fontSize: '12px'
-                      }}
+                      className="pill-tag pill-info"
+                      style={{ fontSize: '11px', padding: '4px 10px' }}
                     >
                       {skill}
                     </span>
@@ -255,35 +304,82 @@ const Swipe = () => {
             </div>
           </div>
           
-          {/* Swipe Buttons */}
+          {/* Swipe Buttons (Tinder Style Circular Buttons) */}
           <div style={{ 
             display: 'flex', 
-            justifyContent: 'space-between', 
-            marginTop: '20px',
-            gap: '20px'
+            justifyContent: 'center', 
+            marginTop: '25px',
+            gap: '24px',
+            alignItems: 'center'
           }}>
             <button 
-              className="btn btn-danger" 
+              className="btn btn-secondary animate-glow" 
               onClick={() => handleSwipe('left')}
               disabled={swiping}
-              style={{ flex: 1, fontSize: '18px' }}
+              style={{ 
+                width: '60px', 
+                height: '60px', 
+                borderRadius: '50%', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                fontSize: '22px',
+                padding: 0,
+                border: '1px solid rgba(239, 68, 68, 0.35)',
+                background: 'rgba(239, 68, 68, 0.12)',
+                color: 'var(--accent-error)',
+                boxShadow: '0 4px 15px rgba(239, 68, 68, 0.15)',
+                transition: 'all 0.25s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.1) rotate(-8deg)';
+                e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+                e.currentTarget.style.background = 'rgba(239, 68, 68, 0.12)';
+              }}
+              title="Pass (Left)"
             >
-              ❌ Pass
+              ❌
             </button>
+            
             <button 
-              className="btn btn-success" 
+              className="btn animate-glow" 
               onClick={() => handleSwipe('right')}
               disabled={swiping}
-              style={{ flex: 1, fontSize: '18px' }}
+              style={{ 
+                width: '74px', 
+                height: '74px', 
+                borderRadius: '50%', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                fontSize: '32px',
+                padding: 0,
+                background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
+                boxShadow: '0 8px 25px rgba(139, 92, 246, 0.45)',
+                border: 'none',
+                transition: 'all 0.25s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.1) translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 12px 30px rgba(139, 92, 246, 0.6)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1) translateY(0)';
+                e.currentTarget.style.boxShadow = '0 8px 25px rgba(139, 92, 246, 0.45)';
+              }}
+              title="Like (Right)"
             >
-              ❤️ Like
+              ❤️
             </button>
           </div>
           
           {/* Progress */}
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <p style={{ color: '#666', margin: 0 }}>
-              {currentIndex + 1} of {users.length} users
+            <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '13px', fontWeight: '500' }}>
+              Profile {currentIndex + 1} of {users.length} available partners
             </p>
           </div>
         </div>
@@ -297,72 +393,71 @@ const Swipe = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'rgba(0,0,0,0.8)',
+          background: 'rgba(5, 5, 12, 0.85)',
+          backdropFilter: 'blur(8px)',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           zIndex: 1000
         }}>
-          <div className="card" style={{ 
-            maxWidth: '500px', 
+          <div className="glass-panel animate-bouncein" style={{ 
+            width: '100%',
+            maxWidth: '460px', 
             textAlign: 'center',
-            background: 'var(--bg-card)',
-            padding: '40px'
+            padding: '40px 30px',
+            border: '2px solid rgba(139, 92, 246, 0.45)',
+            boxShadow: '0 20px 50px rgba(139, 92, 246, 0.3)'
           }}>
-            <div style={{ fontSize: '4rem', marginBottom: '20px' }}>🎉</div>
-            <h2 style={{ color: '#667eea', marginBottom: '10px' }}>It's a Match!</h2>
-            <h3 style={{ marginBottom: '20px' }}>You and {matchedUser.name} can teach each other!</h3>
+            <div style={{ fontSize: '4.5rem', marginBottom: '16px', filter: 'drop-shadow(0 0 10px rgba(139,92,246,0.5))' }}>🎉</div>
+            <h2 className="shimmer-text" style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '8px' }}>It's a Match!</h2>
+            <h3 style={{ marginBottom: '24px', fontSize: '1.2rem', color: 'var(--text-primary)', fontWeight: '500' }}>
+              You and <strong style={{ color: 'var(--accent-secondary)' }}>{matchedUser.name}</strong> can teach each other!
+            </h3>
             
-            <div style={{ marginBottom: '30px' }}>
-              <h4 style={{ color: '#28a745', marginBottom: '10px' }}>You can teach {matchedUser.name}:</h4>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center', marginBottom: '20px' }}>
+            {/* Mutual Exchange Breakdown */}
+            <div style={{ 
+              marginBottom: '30px', 
+              background: 'rgba(255,255,255,0.03)', 
+              borderRadius: '16px', 
+              padding: '20px',
+              border: '1px solid rgba(255,255,255,0.06)' 
+            }}>
+              <h4 style={{ color: 'var(--accent-success)', marginBottom: '8px', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                You can teach {matchedUser.name}:
+              </h4>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center', marginBottom: '16px' }}>
                 {user.skillsKnown?.filter(skill => matchedUser.skillsWanted?.includes(skill)).map((skill, index) => (
-                  <span 
-                    key={index}
-                    style={{
-                      background: '#28a745',
-                      color: 'white',
-                      padding: '4px 12px',
-                      borderRadius: '15px',
-                      fontSize: '12px'
-                    }}
-                  >
+                  <span key={index} className="pill-tag pill-success" style={{ fontSize: '11px' }}>
                     {skill}
                   </span>
                 ))}
               </div>
               
-              <h4 style={{ color: '#007bff', marginBottom: '10px' }}>{matchedUser.name} can teach you:</h4>
+              <h4 style={{ color: 'var(--accent-secondary)', marginBottom: '8px', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                {matchedUser.name} can teach you:
+              </h4>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
                 {matchedUser.skillsKnown?.filter(skill => user.skillsWanted?.includes(skill)).map((skill, index) => (
-                  <span 
-                    key={index}
-                    style={{
-                      background: '#007bff',
-                      color: 'white',
-                      padding: '4px 12px',
-                      borderRadius: '15px',
-                      fontSize: '12px'
-                    }}
-                  >
+                  <span key={index} className="pill-tag pill-info" style={{ fontSize: '11px' }}>
                     {skill}
                   </span>
                 ))}
               </div>
             </div>
             
-            <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+            {/* Match Action Options */}
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button 
                 className="btn btn-success"
                 onClick={() => handleMatchAction('chat')}
-                style={{ flex: 1 }}
+                style={{ flex: 1, textTransform: 'none', fontSize: '15px', padding: '12px 16px' }}
               >
                 💬 Start Chatting
               </button>
               <button 
                 className="btn"
                 onClick={() => handleMatchAction('meeting')}
-                style={{ flex: 1 }}
+                style={{ flex: 1, textTransform: 'none', fontSize: '15px', padding: '12px 16px' }}
               >
                 📅 Schedule Meeting
               </button>
@@ -371,7 +466,7 @@ const Swipe = () => {
             <button 
               className="btn btn-secondary"
               onClick={() => setShowMatchModal(false)}
-              style={{ marginTop: '15px' }}
+              style={{ marginTop: '14px', width: '100%', textTransform: 'none', fontSize: '14px' }}
             >
               Continue Swiping
             </button>

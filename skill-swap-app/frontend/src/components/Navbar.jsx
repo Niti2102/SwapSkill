@@ -54,11 +54,11 @@ const Navbar = () => {
             <Link to="/chat" className={isActive('/chat') ? 'active' : ''} style={{ position: 'relative' }}>
               Chat
               {notificationCounts.messages > 0 && (
-                <span style={{
+                <span className="animate-glow" style={{
                   position: 'absolute',
-                  top: '-8px',
-                  right: '-8px',
-                  background: '#dc3545',
+                  top: '-6px',
+                  right: '-6px',
+                  background: 'linear-gradient(135deg, var(--accent-error), #b91c1c)',
                   color: 'white',
                   borderRadius: '50%',
                   width: '18px',
@@ -66,10 +66,10 @@ const Navbar = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '10px',
-                  fontWeight: 'bold',
-                  animation: 'pulse 2s infinite',
-                  boxShadow: '0 0 8px rgba(220, 53, 69, 0.5)'
+                  fontSize: '9px',
+                  fontWeight: '700',
+                  boxShadow: '0 0 10px rgba(239, 68, 68, 0.55)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)'
                 }}>
                   {notificationCounts.messages > 9 ? '9+' : notificationCounts.messages}
                 </span>
@@ -80,20 +80,22 @@ const Navbar = () => {
             <Link to="/meetings" className={isActive('/meetings') ? 'active' : ''} style={{ position: 'relative' }}>
               Meetings
               {notificationCounts.meetings > 0 && (
-                <span style={{
+                <span className="animate-glow" style={{
                   position: 'absolute',
-                  top: '-8px',
-                  right: '-8px',
-                  background: '#ffc107',
-                  color: '#000',
+                  top: '-6px',
+                  right: '-6px',
+                  background: 'linear-gradient(135deg, var(--accent-warning), #d97706)',
+                  color: 'white',
                   borderRadius: '50%',
                   width: '18px',
                   height: '18px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '10px',
-                  fontWeight: 'bold'
+                  fontSize: '9px',
+                  fontWeight: '700',
+                  boxShadow: '0 0 10px rgba(245, 158, 11, 0.55)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)'
                 }}>
                   {notificationCounts.meetings > 9 ? '9+' : notificationCounts.meetings}
                 </span>

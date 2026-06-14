@@ -305,16 +305,26 @@ const Dashboard = () => {
       <Navbar />
       <div className="container">
         {/* Welcome Header */}
-        <div style={{
-          background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-hover) 100%)',
-          border: '1px solid var(--border-primary)',
-          borderRadius: '20px',
-          padding: '30px',
+        <div className="glass-panel animate-slideup" style={{
+          padding: '40px 30px',
           textAlign: 'center',
           marginBottom: '30px',
-          boxShadow: 'var(--shadow-lg)',
-          position: 'relative'
+          position: 'relative',
+          overflow: 'hidden'
         }}>
+          {/* Subtle glow circle */}
+          <div style={{
+            position: 'absolute',
+            top: '-50px',
+            left: '-50px',
+            width: '180px',
+            height: '180px',
+            background: 'var(--accent-primary)',
+            filter: 'blur(90px)',
+            opacity: 0.15,
+            pointerEvents: 'none'
+          }} />
+          
           <button 
             onClick={fetchStats}
             disabled={loading}
@@ -322,158 +332,112 @@ const Dashboard = () => {
               position: 'absolute',
               top: '20px',
               right: '20px',
-              background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-              border: 'none',
-              borderRadius: '8px',
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              borderRadius: '10px',
               padding: '8px 16px',
-              color: 'white',
+              color: 'var(--text-primary)',
               cursor: loading ? 'not-allowed' : 'pointer',
               fontSize: '14px',
-              fontWeight: '500',
+              fontWeight: '600',
+              textTransform: 'none',
+              letterSpacing: 'normal',
               opacity: loading ? 0.7 : 1,
-              transition: 'opacity 0.3s ease'
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              if(!loading) e.target.style.background = 'rgba(255, 255, 255, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              if(!loading) e.target.style.background = 'rgba(255, 255, 255, 0.08)';
             }}
             title="Refresh Stats"
           >
             🔄 {loading ? 'Refreshing...' : 'Refresh'}
           </button>
-          <h1 style={{
-            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            marginBottom: '8px',
-            fontSize: '2.5rem',
-            fontWeight: '700'
-          }}>Welcome back, {user?.name}! </h1>
+          
+          <h1 className="shimmer-text" style={{
+            marginBottom: '10px',
+            fontSize: '2.8rem',
+            fontWeight: '800',
+            letterSpacing: '-0.5px'
+          }}>
+            Welcome back, {user?.name}!
+          </h1>
           <p style={{ 
             color: 'var(--text-secondary)', 
             margin: 0, 
-            fontSize: '18px'
+            fontSize: '18px',
+            fontWeight: '500'
           }}>
-            Ready to swap some skills today?
+            Ready to swap some skills today? Check out your connections below.
           </p>
         </div>
 
         {/* Stats Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '30px' }}>
           {/* Total Matches */}
-          <div style={{
-            background: 'linear-gradient(135deg, var(--accent-secondary), #0891b2)',
-            color: 'white',
-            borderRadius: '16px',
+          <div className="glass-card animate-slideup" style={{
             padding: '30px',
             textAlign: 'center',
-            boxShadow: 'var(--shadow-lg)',
-            position: 'relative',
-            overflow: 'hidden'
+            borderLeft: '4px solid var(--accent-secondary)',
+            animationDelay: '0.1s'
           }}>
-            <div style={{
-              position: 'absolute',
-              top: '-50%',
-              right: '-50%',
-              width: '100%',
-              height: '100%',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
-              borderRadius: '50%'
-            }} />
-            <div style={{ fontSize: '3.5rem', marginBottom: '10px', position: 'relative' }}>🤝</div>
-            <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: 'bold' }}>{stats.matches}</h3>
-            <p style={{ margin: '10px 0 0 0', opacity: 0.9, fontSize: '1.1rem' }}>Active Connections</p>
+            <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🤝</div>
+            <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: '800', color: 'var(--text-primary)' }}>{stats.matches}</h3>
+            <p style={{ margin: '8px 0 0 0', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Active Connections</p>
           </div>
           
           {/* Completed Exchanges */}
-          <div style={{
-            background: 'linear-gradient(135deg, var(--accent-success), #059669)',
-            color: 'white',
-            borderRadius: '16px',
+          <div className="glass-card animate-slideup" style={{
             padding: '30px',
             textAlign: 'center',
-            boxShadow: 'var(--shadow-lg)',
-            position: 'relative',
-            overflow: 'hidden'
+            borderLeft: '4px solid var(--accent-success)',
+            animationDelay: '0.15s'
           }}>
-            <div style={{
-              position: 'absolute',
-              top: '-50%',
-              right: '-50%',
-              width: '100%',
-              height: '100%',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
-              borderRadius: '50%'
-            }} />
-            <div style={{ fontSize: '3.5rem', marginBottom: '10px', position: 'relative' }}>🎯</div>
-            <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: 'bold' }}>{stats.completedExchanges}</h3>
-            <p style={{ margin: '10px 0 0 0', opacity: 0.9, fontSize: '1.1rem' }}>Completed Exchanges</p>
+            <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🎯</div>
+            <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: '800', color: 'var(--text-primary)' }}>{stats.completedExchanges}</h3>
+            <p style={{ margin: '8px 0 0 0', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Completed Swaps</p>
           </div>
           
           {/* Skills to Teach */}
-          <div style={{
-            background: 'linear-gradient(135deg, var(--accent-primary), #7c3aed)',
-            color: 'white',
-            borderRadius: '16px',
+          <div className="glass-card animate-slideup" style={{
             padding: '30px',
             textAlign: 'center',
-            boxShadow: 'var(--shadow-lg)',
-            position: 'relative',
-            overflow: 'hidden'
+            borderLeft: '4px solid var(--accent-primary)',
+            animationDelay: '0.2s'
           }}>
-            <div style={{
-              position: 'absolute',
-              top: '-50%',
-              right: '-50%',
-              width: '100%',
-              height: '100%',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
-              borderRadius: '50%'
-            }} />
-            <div style={{ fontSize: '3.5rem', marginBottom: '10px', position: 'relative' }}>🧠</div>
-            <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: 'bold' }}>{stats.skillsToTeach}</h3>
-            <p style={{ margin: '10px 0 0 0', opacity: 0.9, fontSize: '1.1rem' }}>Skills to Teach</p>
+            <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🧠</div>
+            <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: '800', color: 'var(--text-primary)' }}>{stats.skillsToTeach}</h3>
+            <p style={{ margin: '8px 0 0 0', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Skills to Share</p>
           </div>
           
           {/* Skills to Learn */}
-          <div style={{
-            background: 'linear-gradient(135deg, var(--accent-warning), #d97706)',
-            color: 'white',
-            borderRadius: '16px',
+          <div className="glass-card animate-slideup" style={{
             padding: '30px',
             textAlign: 'center',
-            boxShadow: 'var(--shadow-lg)',
-            position: 'relative',
-            overflow: 'hidden'
+            borderLeft: '4px solid var(--accent-warning)',
+            animationDelay: '0.25s'
           }}>
-            <div style={{
-              position: 'absolute',
-              top: '-50%',
-              right: '-50%',
-              width: '100%',
-              height: '100%',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
-              borderRadius: '50%'
-            }} />
-            <div style={{ fontSize: '3.5rem', marginBottom: '10px', position: 'relative' }}>📚</div>
-            <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: 'bold' }}>{stats.skillsToLearn}</h3>
-            <p style={{ margin: '10px 0 0 0', opacity: 0.9, fontSize: '1.1rem' }}>Skills to Learn</p>
+            <div style={{ fontSize: '3rem', marginBottom: '12px' }}>📚</div>
+            <h3 style={{ fontSize: '2.5rem', margin: '0', fontWeight: '800', color: 'var(--text-primary)' }}>{stats.skillsToLearn}</h3>
+            <p style={{ margin: '8px 0 0 0', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Skills to Learn</p>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="card" style={{
-          background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-hover) 100%)',
-          border: '1px solid var(--border-primary)',
-          borderRadius: '20px',
+        <div className="glass-panel animate-slideup" style={{
           padding: '30px',
-          marginBottom: '30px',
-          boxShadow: 'var(--shadow-lg)'
+          marginBottom: '30px'
         }}>
           <h2 style={{ 
             color: 'var(--text-primary)', 
-            marginBottom: '25px',
-            fontSize: '1.8rem',
-            fontWeight: '600'
+            marginBottom: '20px',
+            fontSize: '1.6rem',
+            fontWeight: '700',
+            textAlign: 'left'
           }}>Quick Actions</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
             {quickActions.map((action, index) => (
               <Link 
                 key={index} 
@@ -485,32 +449,21 @@ const Dashboard = () => {
                 }}
               >
                 <div 
+                  className="glass-card"
                   style={{ 
-                    background: 'var(--bg-secondary)',
-                    border: `2px solid ${action.color}`,
-                    borderRadius: '16px',
-                    padding: '25px',
+                    padding: '24px',
                     textAlign: 'center',
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    boxShadow: 'var(--shadow-md)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-5px)'
-                    e.currentTarget.style.boxShadow = `0 10px 25px ${action.color}40`
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = 'var(--shadow-md)'
+                    position: 'relative'
                   }}
                 >
-                  <div style={{ fontSize: '3rem', marginBottom: '15px' }}>
+                  <div style={{ fontSize: '2.8rem', marginBottom: '12px' }}>
                     {action.icon}
                   </div>
-                  <h3 style={{ margin: '0 0 10px 0', color: action.color, fontSize: '1.3rem', fontWeight: '600' }}>
+                  <h3 style={{ margin: '0 0 8px 0', color: action.color, fontSize: '1.2rem', fontWeight: '700' }}>
                     {action.title}
                   </h3>
-                  <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '14px' }}>
+                  <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '13px', lineHeight: '1.4' }}>
                     {action.description}
                   </p>
                 </div>
@@ -520,38 +473,25 @@ const Dashboard = () => {
         </div>
 
         {/* Skills Summary */}
-        <div className="card" style={{
-          background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-hover) 100%)',
-          border: '1px solid var(--border-primary)',
-          borderRadius: '20px',
-          padding: '30px',
-          boxShadow: 'var(--shadow-lg)'
+        <div className="glass-panel animate-slideup" style={{
+          padding: '30px'
         }}>
           <h2 style={{ 
             color: 'var(--text-primary)', 
             marginBottom: '25px',
-            fontSize: '1.8rem',
-            fontWeight: '600'
+            fontSize: '1.6rem',
+            fontWeight: '700',
+            textAlign: 'left'
           }}>Your Skills Profile</h2>
+          
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', alignItems: 'start' }}>
             <div style={{ minHeight: '120px' }}>
-              <h3 style={{ color: 'var(--accent-success)', marginBottom: '15px', fontSize: '1.3rem', textAlign: 'left' }}>Skills You Can Teach</h3>
+              <h3 style={{ color: 'var(--accent-success)', marginBottom: '15px', fontSize: '1.2rem', fontWeight: '700', textAlign: 'left' }}>Skills You Can Teach</h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
                 {user?.skillsKnown?.length > 0 ? user.skillsKnown.map((skill, index) => (
                   <span 
                     key={index}
-                    style={{
-                      background: 'var(--accent-success)',
-                      color: 'white',
-                      padding: '8px 16px',
-                      borderRadius: '20px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      boxShadow: 'var(--shadow-sm)',
-                      display: 'inline-block',
-                      whiteSpace: 'nowrap',
-                      textAlign: 'center'
-                    }}
+                    className="pill-tag pill-success"
                   >
                     {skill}
                   </span>
@@ -562,24 +502,14 @@ const Dashboard = () => {
                 )}
               </div>
             </div>
+            
             <div style={{ minHeight: '120px' }}>
-              <h3 style={{ color: 'var(--accent-secondary)', marginBottom: '15px', fontSize: '1.3rem', textAlign: 'left' }}>Skills You Want to Learn</h3>
+              <h3 style={{ color: 'var(--accent-secondary)', marginBottom: '15px', fontSize: '1.2rem', fontWeight: '700', textAlign: 'left' }}>Skills You Want to Learn</h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
                 {user?.skillsWanted?.length > 0 ? user.skillsWanted.map((skill, index) => (
                   <span 
                     key={index}
-                    style={{
-                      background: 'var(--accent-secondary)',
-                      color: 'white',
-                      padding: '8px 16px',
-                      borderRadius: '20px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      boxShadow: 'var(--shadow-sm)',
-                      display: 'inline-block',
-                      whiteSpace: 'nowrap',
-                      textAlign: 'center'
-                    }}
+                    className="pill-tag pill-info"
                   >
                     {skill}
                   </span>

@@ -319,24 +319,32 @@ const Meetings = () => {
       <div>
         <Navbar />
         <div className="container">
-        <div className="card" style={{
-          background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-hover) 100%)',
-          border: '1px solid var(--border-primary)',
-          borderRadius: '20px',
+        <div className="glass-panel animate-slideup" style={{
           padding: '30px',
           marginBottom: '30px',
-          boxShadow: 'var(--shadow-xl)'
+          position: 'relative',
+          overflow: 'hidden'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Subtle glow circle */}
+          <div style={{
+            position: 'absolute',
+            top: '-50px',
+            left: '-50px',
+            width: '180px',
+            height: '180px',
+            background: 'var(--accent-primary)',
+            filter: 'blur(90px)',
+            opacity: 0.12,
+            pointerEvents: 'none'
+          }} />
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
             <div>
-              <h1 style={{
-                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
+              <h1 className="shimmer-text" style={{
                 marginBottom: '8px',
                 fontSize: '2.5rem',
-                fontWeight: '700'
+                fontWeight: '800',
+                letterSpacing: '-0.5px'
               }}>Meetings 📅</h1>
               <p style={{ 
                 color: 'var(--text-secondary)', 
@@ -361,11 +369,12 @@ const Meetings = () => {
                 fontWeight: '600',
                 color: 'white',
                 cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                 boxShadow: 'var(--shadow-lg)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '8px',
+                textTransform: 'none'
               }}
             >
               <span style={{ fontSize: '18px' }}>{showCreateForm ? '❌' : '➕'}</span>
@@ -376,10 +385,8 @@ const Meetings = () => {
 
         {/* Modern Create Meeting Form */}
         {showCreateForm && (
-          <div className="card" style={{
-            background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-hover) 100%)',
-            border: '2px solid var(--accent-primary)',
-            borderRadius: '20px',
+          <div className="glass-panel animate-slideup" style={{
+            border: '1px solid var(--accent-primary)',
             padding: '30px',
             marginBottom: '30px',
             boxShadow: '0 20px 40px rgba(139, 92, 246, 0.15)'
@@ -969,188 +976,172 @@ const Meetings = () => {
               }
               
               return (
-                <div key={meeting._id} style={{
-                  background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-hover) 100%)',
-                  border: `2px solid ${(meeting.status || 'pending') === 'accepted' ? 'var(--accent-success)' : 
-                          (meeting.status || 'pending') === 'pending' ? 'var(--accent-warning)' :
-                          (meeting.status || 'pending') === 'declined' ? 'var(--accent-error)' : 'var(--border-primary)'}`,
-                  borderRadius: '20px',
+                <div key={meeting._id} className="glass-card animate-slideup" style={{
                   padding: '30px',
                   marginBottom: '25px',
-                  boxShadow: `0 10px 30px ${(meeting.status || 'pending') === 'accepted' ? 'rgba(16, 185, 129, 0.15)' : 
-                              (meeting.status || 'pending') === 'pending' ? 'rgba(245, 158, 11, 0.15)' :
-                              (meeting.status || 'pending') === 'declined' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(0, 0, 0, 0.1)'}`,
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  border: '1px solid var(--border-primary)',
+                  borderLeft: `5px solid ${(meeting.status || 'pending') === 'accepted' ? 'var(--accent-success)' : 
+                             (meeting.status || 'pending') === 'pending' ? 'var(--accent-warning)' :
+                             (meeting.status || 'pending') === 'declined' ? 'var(--accent-error)' : 'var(--border-primary)'}`,
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
-                  {/* Status Glow Effect */}
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '4px',
-                    background: `linear-gradient(90deg, ${(meeting.status || 'pending') === 'accepted' ? 'var(--accent-success)' : 
-                                (meeting.status || 'pending') === 'pending' ? 'var(--accent-warning)' :
-                                (meeting.status || 'pending') === 'declined' ? 'var(--accent-error)' : 'var(--border-primary)'}, transparent)`
-                  }} />
-                  
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '25px' }}>
                     {/* Meeting Details */}
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '20px' }}>
-                        <div style={{
-                          background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                          color: 'white',
-                          width: '70px',
-                          height: '70px',
-                          borderRadius: '16px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '2rem',
-                          boxShadow: 'var(--shadow-lg)'
-                        }}>
-                          👤
+                        <div style={{ position: 'relative' }}>
+                          {otherUser.profilePicture ? (
+                            <img 
+                              src={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/users/profile-picture/${otherUser.profilePicture}`}
+                              alt={otherUser.name}
+                              style={{
+                                width: '65px',
+                                height: '65px',
+                                borderRadius: '16px',
+                                objectFit: 'cover',
+                                border: '2px solid rgba(255, 255, 255, 0.1)',
+                                boxShadow: 'var(--shadow-md)'
+                              }}
+                            />
+                          ) : (
+                            <div style={{
+                              background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                              color: 'white',
+                              width: '65px',
+                              height: '65px',
+                              borderRadius: '16px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '1.8rem',
+                              fontWeight: '800',
+                              boxShadow: 'var(--shadow-lg)'
+                            }}>
+                              {otherUser.name?.charAt(0).toUpperCase()}
+                            </div>
+                          )}
                         </div>
                         <div>
                           <h3 style={{ 
-                            margin: '0 0 8px 0', 
+                            margin: '0 0 6px 0', 
                             color: 'var(--text-primary)',
-                            fontSize: '1.4rem',
-                            fontWeight: '600'
+                            fontSize: '1.3rem',
+                            fontWeight: '700'
                           }}>{meeting.title || 'Untitled Meeting'}</h3>
                           <p style={{ 
                             margin: 0, 
-                            fontSize: '16px', 
+                            fontSize: '15px', 
                             fontWeight: '500',
                             color: 'var(--text-secondary)'
                           }}>
-                            {isInitiator ? 'Meeting with' : 'Organized by'} <strong style={{ color: 'var(--text-primary)' }}>{otherUser.name || 'Unknown User'}</strong>
+                            {isInitiator ? 'Session with' : 'Hosted by'} <strong style={{ color: 'var(--text-primary)' }}>{otherUser.name || 'Unknown User'}</strong>
                           </p>
                         </div>
                       </div>
                       
-                      <div style={{ background: 'var(--bg-secondary)', padding: '15px', borderRadius: '10px', marginBottom: '15px', border: '1px solid var(--border-primary)' }}>
-                        <p style={{ margin: '0 0 10px 0', color: '#666' }}>{meeting.description || 'No description provided'}</p>
+                      <div style={{ 
+                        background: 'rgba(255,255,255,0.02)', 
+                        padding: '18px', 
+                        borderRadius: '12px', 
+                        marginBottom: '15px', 
+                        border: '1px solid rgba(255,255,255,0.05)' 
+                      }}>
+                        <p style={{ margin: '0 0 12px 0', color: 'var(--text-secondary)', fontSize: '15px' }}>{meeting.description || 'No description provided'}</p>
                         
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', fontSize: '14px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', fontSize: '14px', color: 'var(--text-secondary)' }}>
                           <div>
-                            <strong>🎓 Teaching:</strong> {meeting.skillToTeach || 'Not specified'}
+                            <span style={{ opacity: 0.7 }}>🎓 Teach:</span> <strong style={{ color: 'var(--accent-success)' }}>{meeting.skillToTeach || 'Not specified'}</strong>
                           </div>
                           <div>
-                            <strong>📚 Learning:</strong> {meeting.skillToLearn || 'Not specified'}
+                            <span style={{ opacity: 0.7 }}>📚 Learn:</span> <strong style={{ color: 'var(--accent-secondary)' }}>{meeting.skillToLearn || 'Not specified'}</strong>
                           </div>
                           <div>
-                            <strong>📅 Date:</strong> {meeting.scheduledDate ? new Date(meeting.scheduledDate).toLocaleDateString() : 'Not set'}
+                            <span style={{ opacity: 0.7 }}>📅 Date:</span> <strong style={{ color: 'var(--text-primary)' }}>{meeting.scheduledDate ? new Date(meeting.scheduledDate).toLocaleDateString() : 'Not set'}</strong>
                           </div>
                           <div>
-                            <strong>⏰ Time:</strong> {meeting.scheduledDate ? new Date(meeting.scheduledDate).toLocaleTimeString() : 'Not set'}
+                            <span style={{ opacity: 0.7 }}>⏰ Time:</span> <strong style={{ color: 'var(--text-primary)' }}>{meeting.scheduledDate ? new Date(meeting.scheduledDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Not set'}</strong>
                           </div>
                           <div>
-                            <strong>⏱️ Duration:</strong> {meeting.duration || 60} minutes
+                            <span style={{ opacity: 0.7 }}>⏱️ Duration:</span> <strong style={{ color: 'var(--text-primary)' }}>{meeting.duration || 60} mins</strong>
                           </div>
                           <div>
-                            <strong>📹 Type:</strong> {(meeting.meetingType || 'video_call').replace('_', ' ')}
+                            <span style={{ opacity: 0.7 }}>📹 Location:</span> <strong style={{ color: 'var(--text-primary)' }}>{(meeting.meetingType || 'video_call').replace('_', ' ').toUpperCase()}</strong>
                           </div>
                         </div>
                         
                         {meeting.location && (
-                          <p style={{ margin: '10px 0 0 0' }}>
-                            <strong>📍 Location:</strong> {meeting.location}
+                          <p style={{ margin: '12px 0 0 0', fontSize: '14px', color: 'var(--text-secondary)' }}>
+                            <span style={{ opacity: 0.7 }}>📍 Physical Address:</span> <strong style={{ color: 'var(--text-primary)' }}>{meeting.location}</strong>
                           </p>
                         )}
                       </div>
                       
                       {/* Participant Skills */}
-                      <div style={{ marginBottom: '15px' }}>
-                        <h4 style={{ margin: '0 0 10px 0', fontSize: '16px' }}>{otherUser.name || 'User'}'s Skills:</h4>
-                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                          <div>
-                            <span style={{ fontSize: '12px', color: '#666', marginRight: '5px' }}>Can teach:</span>
+                      <div style={{ marginBottom: '20px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+                            <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginRight: '4px' }}>Can teach:</span>
                             {(otherUser.skillsKnown || []).slice(0, 3).map((skill, index) => (
-                              <span key={index} style={{
-                                background: '#28a745',
-                                color: 'white',
-                                padding: '2px 8px',
-                                borderRadius: '10px',
-                                fontSize: '12px',
-                                marginRight: '5px'
-                              }}>
+                              <span key={index} className="pill-tag pill-success" style={{ fontSize: '10px', padding: '2px 8px' }}>
                                 {skill}
                               </span>
                             ))}
                             {(!otherUser.skillsKnown || otherUser.skillsKnown.length === 0) && (
-                              <span style={{ fontSize: '12px', color: '#999' }}>No skills listed</span>
+                              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>No skills listed</span>
                             )}
                           </div>
-                          <div>
-                            <span style={{ fontSize: '12px', color: '#666', marginRight: '5px' }}>Wants to learn:</span>
+                          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+                            <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginRight: '4px' }}>Wants to learn:</span>
                             {(otherUser.skillsWanted || []).slice(0, 3).map((skill, index) => (
-                              <span key={index} style={{
-                                background: '#007bff',
-                                color: 'white',
-                                padding: '2px 8px',
-                                borderRadius: '10px',
-                                fontSize: '12px',
-                                marginRight: '5px'
-                              }}>
+                              <span key={index} className="pill-tag pill-info" style={{ fontSize: '10px', padding: '2px 8px' }}>
                                 {skill}
                               </span>
                             ))}
                             {(!otherUser.skillsWanted || otherUser.skillsWanted.length === 0) && (
-                              <span style={{ fontSize: '12px', color: '#999' }}>No skills listed</span>
+                              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>No skills listed</span>
                             )}
                           </div>
                         </div>
                       </div>
                       
-                      {/* Status Badge */}
+                      {/* Status Badges */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{
-                          padding: '6px 12px',
-                          borderRadius: '15px',
-                          fontSize: '12px',
-                          fontWeight: 'bold',
-                          background: (meeting.status || 'pending') === 'accepted' ? '#28a745' : 
-                                     (meeting.status || 'pending') === 'pending' ? '#ffc107' : 
-                                     (meeting.status || 'pending') === 'declined' ? '#dc3545' : '#6c757d',
-                          color: (meeting.status || 'pending') === 'pending' ? '#000' : 'white'
-                        }}>
-                          {(meeting.status || 'pending').toUpperCase()}
+                        <span className={`pill-tag ${
+                          (meeting.status || 'pending') === 'accepted' ? 'pill-success' : 
+                          (meeting.status || 'pending') === 'pending' ? 'pill-warning animate-glow' : 
+                          (meeting.status || 'pending') === 'declined' ? 'pill-danger' : 'pill-info'
+                        }`} style={{ fontSize: '11px', textTransform: 'uppercase' }}>
+                          {(meeting.status || 'pending')}
                         </span>
                         
-                        {isInitiator && (
-                          <span style={{
-                            padding: '6px 12px',
-                            borderRadius: '15px',
-                            fontSize: '12px',
-                            fontWeight: 'bold',
-                            background: '#17a2b8',
-                            color: 'white'
-                          }}>
-                            INITIATOR
+                        {isInitiator ? (
+                          <span className="pill-tag pill-primary" style={{ fontSize: '11px', textTransform: 'uppercase' }}>
+                            Sent Request
+                          </span>
+                        ) : (
+                          <span className="pill-tag pill-info" style={{ fontSize: '11px', textTransform: 'uppercase' }}>
+                            Received Request
                           </span>
                         )}
                       </div>
                     </div>
                     
                     {/* Action Buttons */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', minWidth: '120px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', minWidth: '130px' }}>
                       {(meeting.status || 'pending') === 'pending' && !isInitiator && (
                         <>
                           <button 
                             className="btn btn-success"
                             onClick={() => handleMeetingAction(meeting._id, 'accept')}
-                            style={{ fontSize: '14px', padding: '8px 16px' }}
+                            style={{ fontSize: '13px', padding: '10px 14px', textTransform: 'none' }}
                           >
                             ✓ Accept
                           </button>
                           <button 
                             className="btn btn-danger"
                             onClick={() => handleMeetingAction(meeting._id, 'decline')}
-                            style={{ fontSize: '14px', padding: '8px 16px' }}
+                            style={{ fontSize: '13px', padding: '10px 14px', textTransform: 'none' }}
                           >
                             ✗ Decline
                           </button>
@@ -1161,7 +1152,7 @@ const Meetings = () => {
                         <button 
                           className="btn btn-secondary"
                           onClick={() => handleMeetingAction(meeting._id, 'cancel')}
-                          style={{ fontSize: '14px', padding: '8px 16px' }}
+                          style={{ fontSize: '13px', padding: '10px 14px', textTransform: 'none' }}
                         >
                           🚫 Cancel
                         </button>
@@ -1171,7 +1162,7 @@ const Meetings = () => {
                         <button 
                           className="btn btn-success"
                           onClick={() => handleMeetingAction(meeting._id, 'complete')}
-                          style={{ fontSize: '14px', padding: '8px 16px' }}
+                          style={{ fontSize: '13px', padding: '10px 14px', textTransform: 'none' }}
                         >
                           ✓ Complete
                         </button>
