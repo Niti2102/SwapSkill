@@ -12,19 +12,22 @@ connectDB();
 
 const app = express();
 const server = http.createServer(app);
+const ALLOWED_ORIGINS = process.env.NODE_ENV === 'production'
+    ? [process.env.FRONTEND_URL || 'https://swap-skill-73km.vercel.app']
+    : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'];
+
 const io = socketIo(server, {
     cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
+        origin: ALLOWED_ORIGINS,
+        methods: ["GET", "POST"],
+        credentials: true
     }
 });
 
 // Middleware
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' 
-        ? '*' // Allow all origins in production for testing
-        : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173', 'http://localhost:8000'],
-    credentials: false, // Set to false when using '*' origin
+    origin: ALLOWED_ORIGINS,
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
